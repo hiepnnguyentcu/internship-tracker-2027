@@ -339,3 +339,43 @@ Routine IDs created: `trig_01CiwaBMeVDeMvN9xG1T2FCV` (listings, `13 */3 * * *` U
   - `stats_report.py` correctly showed 2 total applications, both `Applied`, 0% response (accurate — they were just submitted).
   - OA/calendar-reminder and cold-email send/reply-check paths were **not** re-exercised with real data this round (both already verified live with test accounts in Milestones 3-4) — the user opted to skip a real cold-email send for M7 specifically, so that leg of the FR1 chain stays validated-with-test-data rather than validated-with-production-data.
 - Unlike every previous milestone's testing, **this data was not cleaned up afterward** — it's the user's real, permanent tracker data, not test/seed data.
+
+---
+
+## Phase 2: Auto-Apply Desktop App
+
+The MVP (Milestones 1-7) is done. This phase builds the native PySide6 app + browser automation + resume-tweak pipeline described in the "Phase 2" section of the design plan (`~/.claude/plans/i-need-to-brainstorm-declarative-acorn.md`). Unlike M1-M7, Phase 2 wasn't pre-broken into day-by-day milestones before building started — chunks get documented here as they're actually built.
+
+### Chunk 2 — Apply-flow UI shell (queue + apply dialog + tweak dialog)
+
+**Goal**: A real, launchable desktop window showing the live apply queue, with an apply flow and a tweak-review flow — explicitly wired to stubs for the pieces not built yet (ATS automation, Drive/Docs, Claude-generated tweaks), rather than faking functionality that doesn't exist.
+
+**Why "chunk 2" and not "chunk 1"**: the user's own framing. Milestones 1-7 collectively are the data/backend layer chunk 2 builds on (Sheets schema, `record_application`, `register_resume`, `jd_keyword_check`) — there wasn't a separately-numbered "chunk 1."
+
+**What's real vs. stubbed**:
+- **Real**: the queue (`app/queue_model.py`) computes actual unapplied listings — `ListingsSeen` rows with no matching `Applications.job_url` — live from the real sheet (779 rows at build time, correctly excluding the 2 real applications logged in Milestone 7). The resume picker lists real `Resumes` rows. "Open & Apply" opens the real job URL and, on confirmation, calls the same `record_application()` the CLI uses — a real, permanent `Applications` + `StageEvents` row gets written, not a mock.
+- **Stubbed, clearly labeled as such in the UI itself** (not silently fake):
+  - **JD-match score / needs-tweak columns** show "—" always. Real scoring needs resume *text*, which needs the Drive/Docs client (not built) — resumes currently only exist as Drive Doc *links*. Showing a fabricated percentage would be worse than showing nothing.
+  - **"Adjust Resume…"** opens a dialog that explains tweaking isn't implemented yet, rather than a fake diff.
+  - **Applying** is "open the real listing in your browser, confirm once you've actually submitted it, then log it" — not real ATS form-filling (Greenhouse/Lever/Ashby automation is a later chunk).
+
+**Files built**:
+- `app/queue_model.py` — `QueueItem` dataclass, `load_queue()`, `load_resumes()`.
+- `app/main_window.py` — `MainWindow`: queue table (Company/Role/Location/Source/First Seen/JD Match/Needs Tweak/Apply-button), Refresh button.
+- `app/apply_dialog.py` — `ApplyDialog`: resume picker, "Adjust Resume…" (opens the tweak stub), "Open & Apply" (browser + confirm + `record_application`).
+- `app/tweak_dialog.py` — `TweakDialog`: stub explanation dialog.
+- `app/main.py` — entrypoint (`python app/main.py`).
+- Refactored `scripts/log_application.py` → exposes `record_application()` (core logic) with `main()` as a thin CLI wrapper; `scripts/log_resume.py` → exposes `register_resume()` + `ResumeConflictError` the same way. Both the CLI and the app now call the identical code path, per the Phase 2 plan's explicit requirement — added `scripts/__init__.py` to make this importable as `from scripts.log_application import record_application`.
+- `requirements.txt` — added `PySide6==6.11.1`.
+
+**Testing performed**:
+- [x] Regression: full pytest suite (25 tests) still passes after the `log_application.py`/`log_resume.py` refactor.
+- [x] Regression: CLI behavior unchanged post-refactor — re-ran `log_application.py` and `log_resume.py` from the command line, confirmed identical output/behavior to pre-refactor (test rows cleaned up after; the real R1/Rippling/Capital One data was untouched).
+- [x] Headless smoke test (`QT_QPA_PLATFORM=offscreen`, since this dev environment has no real display): `MainWindow` constructs against the live sheet, loads 779 real queue rows and 1 real resume, correctly excludes the 2 already-applied listings. `ApplyDialog` and `TweakDialog` construct without error against real data.
+- [ ] **Not done, and can't be done from here**: actually opening/visually inspecting the running window. This is a native desktop app — there's no browser to screenshot. The offscreen smoke test proves the code runs without crashing and loads correct data; it does **not** prove the layout looks right, buttons are positioned sensibly, or the dialogs read well. **The user needs to run `python app/main.py` locally and look at it themselves before this chunk is considered visually verified.**
+
+**Known gaps, deliberate for this chunk (see "Phase 2" plan for the full roadmap)**:
+- No Drive/Docs OAuth scopes added yet — needed for real resume-text fetching (JD-match scoring) and the tweak pipeline.
+- No Playwright/ATS automation yet.
+- No Claude-API-based tweak generation yet (needs an Anthropic API key provisioned, since the app runs standalone).
+- Apply flow doesn't yet collect referral/notes in the dialog (CLI still supports it; the UI defaults to `referral=N`) — minor, easy follow-up.
