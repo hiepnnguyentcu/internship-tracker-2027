@@ -148,3 +148,18 @@ class SheetsClient:
             valueInputOption="RAW",
             body={"values": [headers]},
         ).execute()
+
+    def add_column(self, tab: str, column_name: str) -> None:
+        """Appends a new column header to an existing tab. Idempotent: no-ops
+        if the column already exists. Existing rows read back with "" for the
+        new column (read_tab already pads short rows), no backfill needed."""
+        headers = self._headers(tab)
+        if column_name in headers:
+            return
+        new_headers = headers + [column_name]
+        self._sheets.values().update(
+            spreadsheetId=self.sheet_id,
+            range=f"{tab}!A1",
+            valueInputOption="RAW",
+            body={"values": [new_headers]},
+        ).execute()

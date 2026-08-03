@@ -15,6 +15,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/gmail.send",
     "https://www.googleapis.com/auth/gmail.readonly",
     "https://www.googleapis.com/auth/calendar.events",
+    "https://www.googleapis.com/auth/drive.readonly",  # Phase 2 sub-chunk B: resume PDF export only, never writes to Drive
 ]
 
 

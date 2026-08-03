@@ -415,3 +415,25 @@ The MVP (Milestones 1-7) is done. This phase builds the web app + browser automa
 - No `Identity` tab yet, no `drive_client.py`, no real ATS automation — `/apply/manual` is still the only apply path, same as Chunk 2's desktop version.
 - No queue multi-select / batch "Apply to Selected" yet — that's part of sub-chunk C, bundled with the real automation it drives.
 - JD-match score column still shows "—" — unchanged from Chunk 2, still blocked on Drive text access.
+
+---
+
+### Chunk 4 (sub-chunk B) — Identity tab + minimal `drive_client.py`
+
+**Goal**: Get the two things real ATS automation needs that didn't exist yet — biographical data to fill standard form fields, and a way to get the current resume onto disk as a PDF for the upload field.
+
+**Files built**:
+- `scripts/migrate_add_identity_and_apply_method.py` — idempotent migration: creates the `Identity` tab, adds `apply_method` to `Applications` via the new `SheetsClient.add_column()`, backfills existing rows to `Manual` (accurate — everything logged so far was applied to by hand).
+- `drive_client.py` — `DriveClient.export_doc_as_pdf(doc_url_or_id, output_path)` via the Drive API's `files.export`. Read-only (`drive.readonly` scope), never writes to Drive.
+- `google_auth.py` — added `drive.readonly` to `SCOPES`.
+
+**Setup steps done live with the user** (both required — this wasn't just a code change):
+- Re-ran `setup_auth.py` for a token covering the new scope (the user completed the browser consent step).
+- The Drive API itself wasn't enabled on the Google Cloud project yet (separate from OAuth scope consent) — hit a live `403 accessNotConfigured` on the first export attempt, user enabled it in Cloud Console, retried successfully.
+
+**Real data registered**: an `Identity` row (`ID1`) with the user's actual name, school (TCU), grad year, LinkedIn, and work-authorization/sponsorship status (asked directly rather than guessed, since this fills real legal-status fields on real applications).
+
+**Testing performed**:
+- [x] Regression: full pytest suite (25 tests) still passes.
+- [x] Migration script is genuinely idempotent — re-ran it, confirmed zero duplicate backfills the second time.
+- [x] Live export against the user's **real** resume Doc: produced a valid 142,990-byte, 1-page PDF; confirmed the PDF's embedded metadata/links (title, mailto, LinkedIn, GitHub) match the real resume content, not a blank/corrupt file. Test file deleted after verification.
