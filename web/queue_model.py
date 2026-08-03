@@ -1,12 +1,11 @@
-"""Computes the live 'apply queue' for the desktop app: ListingsSeen rows
-with no matching Applications row yet (matched by job URL).
+"""Computes the live 'apply queue': ListingsSeen rows with no matching
+Applications row yet (matched by job URL).
 
 JD-match scoring and the "needs tweak" flag both depend on real resume TEXT,
-which requires the Drive/Docs client (explicitly not built in this chunk —
-resumes currently only exist as Drive Doc links, not fetchable text from a
-standalone app with no Drive API scope yet). Both show as unavailable
-("—") rather than faking a number. This is a deliberate stub, not an
-oversight — see MILESTONES.md's Phase 2 chunk notes.
+which requires the Drive/Docs client. As of sub-chunk A this still isn't
+built for scoring purposes (sub-chunk B only adds PDF export, not text
+extraction for scoring) — both show as unavailable ("—") rather than faking
+a number. Deliberate stub, not an oversight — see MILESTONES.md.
 """
 from __future__ import annotations
 
@@ -24,8 +23,8 @@ class QueueItem:
     source_repo: str
     url: str
     date_first_seen: str
-    jd_match_score: float | None = None  # None = not yet available (needs Drive integration)
-    needs_tweak: bool | None = None  # None = not yet available (needs Drive integration)
+    jd_match_score: float | None = None  # None = not yet available
+    needs_tweak: bool | None = None  # None = not yet available
 
 
 def load_queue(sheets: SheetsClient | None = None) -> list[QueueItem]:
@@ -54,3 +53,10 @@ def load_queue(sheets: SheetsClient | None = None) -> list[QueueItem]:
 def load_resumes(sheets: SheetsClient | None = None) -> list[dict]:
     sheets = sheets or SheetsClient()
     return sheets.read_tab("Resumes")
+
+
+def find_queue_item(listing_key: str, sheets: SheetsClient | None = None) -> QueueItem | None:
+    for item in load_queue(sheets):
+        if item.listing_key == listing_key:
+            return item
+    return None

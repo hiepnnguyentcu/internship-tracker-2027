@@ -342,9 +342,11 @@ Routine IDs created: `trig_01CiwaBMeVDeMvN9xG1T2FCV` (listings, `13 */3 * * *` U
 
 ---
 
-## Phase 2: Auto-Apply Desktop App
+## Phase 2: Web App + Auto-Apply
 
-The MVP (Milestones 1-7) is done. This phase builds the native PySide6 app + browser automation + resume-tweak pipeline described in the "Phase 2" section of the design plan (`~/.claude/plans/i-need-to-brainstorm-declarative-acorn.md`). Unlike M1-M7, Phase 2 wasn't pre-broken into day-by-day milestones before building started — chunks get documented here as they're actually built.
+The MVP (Milestones 1-7) is done. This phase builds the web app + browser automation described in the "Phase 2: Web App + Auto-Apply (revised)" section of the design plan (`~/.claude/plans/i-need-to-brainstorm-declarative-acorn.md`). Unlike M1-M7, Phase 2 wasn't pre-broken into day-by-day milestones before building started — chunks get documented here as they're actually built.
+
+**Revision note**: Chunk 2 below shipped a PySide6 **desktop** app. The user then asked to drop it for a **web** app (reachable from other devices via Tailscale, not PySide6) and to build the real auto-apply automation next, with resume-tweak generation explicitly deferred. Chunk 2's content is left intact below as an accurate build record — it was real, tested, working code — but it has since been **deleted** (see Chunk 3). Treat anything below referencing `app/`, `PySide6`, `MainWindow`, `ApplyDialog`, or `TweakDialog` as historical, not current.
 
 ### Chunk 2 — Apply-flow UI shell (queue + apply dialog + tweak dialog)
 
@@ -379,3 +381,37 @@ The MVP (Milestones 1-7) is done. This phase builds the native PySide6 app + bro
 - No Playwright/ATS automation yet.
 - No Claude-API-based tweak generation yet (needs an Anthropic API key provisioned, since the app runs standalone).
 - Apply flow doesn't yet collect referral/notes in the dialog (CLI still supports it; the UI defaults to `referral=N`) — minor, easy follow-up.
+
+---
+
+### Chunk 3 (sub-chunk A) — Desktop app removed, FastAPI web app scaffold
+
+**Goal**: Replace the PySide6 desktop app with a web app, at feature parity — queue view, auth gate, manual apply-and-log flow — as the foundation sub-chunk C's real automation gets wired into.
+
+**What changed from Chunk 2**:
+- Deleted entirely: `app/main.py`, `app/main_window.py`, `app/apply_dialog.py`, `app/tweak_dialog.py`, and `PySide6` from `requirements.txt` (uninstalled from the venv too).
+- `app/queue_model.py` had no PySide6 dependency (pure `SheetsClient` logic) — moved verbatim into `web/queue_model.py`, plus a small `find_queue_item()` addition needed by the apply route.
+- The desktop app's "open link → manually apply → confirm → log" behavior carries forward as-is, just as HTML instead of Qt widgets: an "Open ↗" link (new tab) next to a per-row resume-picker form with a JS `confirm()` ("have you actually submitted this?") before it calls the same `record_application()`.
+
+**Files built**:
+- `web/auth.py` — shared-password gate (`TRACKER_WEB_PASSWORD` env var, `secrets.compare_digest` for the check, in-memory session-token set, httponly cookie). Deliberately simple: Tailscale (network-level access control, set up by the user outside this codebase) is the primary defense; this is a second layer, not the only one — appropriate for a single-user personal tool, not a general-purpose auth system.
+- `web/queue_model.py` — moved from `app/`, plus `find_queue_item(listing_key)`.
+- `web/main.py` — FastAPI app: `/login` (GET/POST), `/logout`, `/queue` (GET, protected), `/apply/manual` (POST, protected).
+- `web/templates/login.html`, `web/templates/queue.html` — server-rendered Jinja2, no JS framework/build step.
+- `requirements.txt` — removed `PySide6`, added `fastapi`, `uvicorn`, `jinja2`, `python-multipart` (required by FastAPI for parsing HTML form POSTs).
+
+**Testing performed (all against the real running server, not just unit tests)**:
+- [x] Regression: full pytest suite (25 tests) still passes.
+- [x] Started `uvicorn web.main:app` locally, hit it with real `curl` requests (not just constructed objects in-process, unlike Chunk 2's offscreen-Qt approach — this app has no headless-rendering equivalent gap, since HTTP responses are the real interface):
+  - Unauthenticated `GET /queue` → `307` redirect to `/login`. ✅
+  - Wrong password → `303` redirect to `/login?error=1`. ✅
+  - Correct password → `303` to `/queue` with a valid session cookie set. ✅
+  - Authenticated `GET /queue` → real data: loaded the live sheet correctly.
+  - `POST /apply/manual` against a **fake, clearly-marked test listing** (added to `ListingsSeen`, then deleted afterward along with the resulting test `Applications`/`StageEvents` rows) → correctly created a real `Applications` row, correct flash-message redirect.
+  - `POST /apply/manual` against a nonexistent `listing_key` → correct error-message redirect, no row created.
+- **Found and resolved a false alarm, not a bug**: while verifying the queue count, noticed an `Applications` row (`A0003`, Amazon) with no corresponding record in anything done this session. Traced every request made during testing via the uvicorn access log and confirmed none of them could have created it, then asked the user directly rather than guessing or silently deleting a real-looking row — confirmed it was the user's own real, manual use of the now-removed desktop app before it was taken down. Left untouched, as it should be.
+
+**Known gaps for this sub-chunk (by design — sub-chunks B/C are next)**:
+- No `Identity` tab yet, no `drive_client.py`, no real ATS automation — `/apply/manual` is still the only apply path, same as Chunk 2's desktop version.
+- No queue multi-select / batch "Apply to Selected" yet — that's part of sub-chunk C, bundled with the real automation it drives.
+- JD-match score column still shows "—" — unchanged from Chunk 2, still blocked on Drive text access.

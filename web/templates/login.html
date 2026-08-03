@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head>
+  <title>Internship Tracker — Login</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 360px; margin: 120px auto; padding: 0 16px; }
+    input, button { width: 100%; padding: 10px; margin-top: 8px; box-sizing: border-box; font-size: 14px; }
+    .error { color: #c0392b; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h2>Internship Tracker</h2>
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  <form method="post" action="/login">
+    <input type="password" name="password" placeholder="Password" autofocus>
+    <button type="submit">Log in</button>
+  </form>
+</body>
+</html>

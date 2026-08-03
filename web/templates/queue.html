@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+  <title>Internship Tracker — Apply Queue</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; padding: 8px; border-bottom: 1px solid #ddd; font-size: 14px; vertical-align: middle; }
+    th { color: #666; font-weight: 600; }
+    .flash { background: #e6f4ea; padding: 8px 12px; border-radius: 4px; margin-bottom: 16px; font-size: 14px; }
+    .error { background: #fdecea; color: #c0392b; padding: 8px 12px; border-radius: 4px; margin-bottom: 16px; font-size: 14px; }
+    form.inline { display: flex; gap: 6px; align-items: center; }
+    select, button { padding: 4px 8px; font-size: 13px; }
+    .muted { color: #999; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h2>Apply Queue <span class="muted">({{ queue|length }} unapplied)</span></h2>
+  {% if flash %}<div class="flash">{{ flash }}</div>{% endif %}
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+  {% if not resumes %}
+  <p class="muted">No resumes registered yet — run <code>python scripts/log_resume.py ...</code> first.</p>
+  {% endif %}
+
+  <table>
+    <tr>
+      <th>Company</th><th>Role</th><th>Location</th><th>Source</th><th>First Seen</th><th>JD Match</th><th>Listing</th><th>Log Application</th>
+    </tr>
+    {% for item in queue %}
+    <tr>
+      <td>{{ item.company }}</td>
+      <td>{{ item.role }}</td>
+      <td>{{ item.location }}</td>
+      <td>{{ item.source_repo }}</td>
+      <td>{{ item.date_first_seen }}</td>
+      <td class="muted">—</td>
+      <td><a href="{{ item.url }}" target="_blank" rel="noopener">Open ↗</a></td>
+      <td>
+        {% if resumes %}
+        <form class="inline" method="post" action="/apply/manual"
+              onsubmit="return confirm('Have you actually submitted this application already?');">
+          <input type="hidden" name="listing_key" value="{{ item.listing_key }}">
+          <select name="resume_id">
+            {% for r in resumes %}
+            <option value="{{ r.resume_id }}">{{ r.resume_id }} — {{ r.track }}/{{ r.variant }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit">Log as Applied</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <form method="post" action="/logout" style="margin-top: 24px;"><button type="submit">Log out</button></form>
+</body>
+</html>
