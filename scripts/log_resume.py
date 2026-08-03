@@ -1,0 +1,63 @@
+"""Registers a resume version. Enforces version integrity: refuses to
+silently overwrite an existing resume_id's linked file — bump the id instead
+(e.g. R1 -> R1.1) if the resume content actually changed, so past
+applications keep pointing at the exact version that was sent.
+
+Usage:
+    python scripts/log_resume.py --resume-id R1 --track "Full-Stack" \\
+        --variant A --email you@example.com --phone 555-555-5555 \\
+        --drive-link https://drive.google.com/... [--notes "..."]
+"""
+import argparse
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from sheets_client import SheetsClient  # noqa: E402
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--resume-id", required=True)
+    parser.add_argument("--track", required=True, choices=["Full-Stack", "Low-Level Systems"])
+    parser.add_argument("--variant", required=True, choices=["A", "B"])
+    parser.add_argument("--email", required=True)
+    parser.add_argument("--phone", required=True)
+    parser.add_argument("--drive-link", required=True)
+    parser.add_argument("--notes", default="")
+    args = parser.parse_args()
+
+    sheets = SheetsClient()
+    matches = sheets.find_rows("Resumes", resume_id=args.resume_id)
+
+    if matches:
+        _, existing = matches[-1]
+        if existing.get("drive_link") != args.drive_link:
+            raise SystemExit(
+                f"resume_id '{args.resume_id}' already exists with a different drive_link "
+                f"({existing.get('drive_link')!r} vs {args.drive_link!r}).\n"
+                "If you've actually changed the resume content, register it under a NEW "
+                "resume_id instead (e.g. bump R1 -> R1.1) so past applications keep pointing "
+                "at the exact version that was sent."
+            )
+        print(f"resume_id '{args.resume_id}' is already registered identically. No changes made.")
+        return
+
+    sheets.append_row(
+        "Resumes",
+        {
+            "resume_id": args.resume_id,
+            "track": args.track,
+            "variant": args.variant,
+            "email_used": args.email,
+            "phone_used": args.phone,
+            "drive_link": args.drive_link,
+            "notes": args.notes,
+        },
+    )
+    print(f"Registered resume '{args.resume_id}' ({args.track} / variant {args.variant}).")
+
+
+if __name__ == "__main__":
+    main()

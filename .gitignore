@@ -1,0 +1,8 @@
+credentials/
+config.local.yaml
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+stats_chart.html

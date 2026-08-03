@@ -1,0 +1,158 @@
+[
+  {
+    "source": "Simplify",
+    "category": "Software",
+    "company_name": "Amazon",
+    "id": "c44d58c3-05e3-470a-9f21-4722f9d8522d",
+    "title": "Software Development Engineer Internship - Summer 2026 - US",
+    "active": true,
+    "terms": [
+      "Summer 2026"
+    ],
+    "date_updated": 1765328439,
+    "date_posted": 1765328439,
+    "url": "https://amazon.jobs/en/jobs/3116030/software-development-engineer-internship-summer-2026-us",
+    "locations": [
+      "Seattle, WA"
+    ],
+    "company_url": "https://simplify.jobs/c/Amazon",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": []
+  },
+  {
+    "source": "Simplify",
+    "category": "Software",
+    "company_name": "Palantir",
+    "id": "ada5c220-536e-454a-8ba0-1f7629d949e6",
+    "title": "Forward Deployed Software Engineer \u2013 Internship - US Government",
+    "active": true,
+    "terms": [
+      "Winter 2027",
+      "Spring 2027",
+      "Summer 2027",
+      "Fall 2027"
+    ],
+    "date_updated": 1765581501,
+    "date_posted": 1765581501,
+    "url": "https://jobs.lever.co/palantir/315f695d-04d1-4a9a-848e-cb2bec7a997e/apply",
+    "locations": [
+      "Honolulu, HI"
+    ],
+    "company_url": "https://simplify.jobs/c/Palantir",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": []
+  },
+  {
+    "source": "Simplify",
+    "category": "Software",
+    "company_name": "Oracle",
+    "id": "ca02d914-593b-486b-8f1a-3cbedfb545cd",
+    "title": "Advanced Degree Software Engineer Intern - Industries",
+    "active": true,
+    "terms": [
+      "Spring 2026"
+    ],
+    "date_updated": 1766247431,
+    "date_posted": 1766247431,
+    "url": "https://eeho.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_45001/job/320947",
+    "locations": [
+      "United States"
+    ],
+    "company_url": "https://simplify.jobs/c/Oracle",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": []
+  },
+  {
+    "source": "Simplify",
+    "category": "Software",
+    "company_name": "Powell",
+    "id": "0bd0599a-6034-42af-b04a-615915c012b4",
+    "title": "Software Engineering Intern",
+    "active": false,
+    "terms": [
+      "Summer 2027"
+    ],
+    "date_updated": 1765051866,
+    "date_posted": 1765051866,
+    "url": "https://ekcf.fa.us6.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/job/6630",
+    "locations": [
+      "Melrose Park, IL"
+    ],
+    "company_url": "https://simplify.jobs/c/Powell",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": []
+  },
+  {
+    "source": "Simplify",
+    "category": "Software",
+    "company_name": "Axiom Space",
+    "id": "dd011631-8df9-446c-bf3c-60d91a5c1084",
+    "title": "Mission Operations Engineer",
+    "active": false,
+    "terms": [
+      "Summer 2026"
+    ],
+    "date_updated": 1765232236,
+    "date_posted": 1765232236,
+    "url": "https://axiomspace.wd5.myworkdayjobs.com/External_Career_Site/job/Houston/Mission-Operations-Engineering-Intern--Summer-2026-_JR100353",
+    "locations": [
+      "Houston, TX"
+    ],
+    "company_url": "https://simplify.jobs/c/AxiomSpace",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": []
+  },
+  {
+    "source": "Simplify",
+    "category": "AI/ML/Data",
+    "company_name": "Amazon",
+    "id": "83202c55-8636-4cc2-9b99-1ae2c111a000",
+    "title": "Amazon Robotics \u2013 Applied Scientist 2 Intern / Co-op - 2026",
+    "active": true,
+    "terms": [
+      "Summer 2026",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "date_updated": 1765178876,
+    "date_posted": 1765178876,
+    "url": "https://amazon.jobs/en/jobs/3104589/amazon-robotics-applied-scientist-ii-intern-co-op-2026-robotics-manipulation-perception-motion-planning-autonomous-mobile-robots-computer-vision-machine-learning-controls-and-more",
+    "locations": [
+      "Seattle, WA",
+      "Wakefield, MA",
+      "Westborough, MA"
+    ],
+    "company_url": "https://simplify.jobs/c/Amazon",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": []
+  },
+  {
+    "date_updated": 1765920180,
+    "sponsorship": "Does Not Offer Sponsorship",
+    "active": true,
+    "degrees": [
+      "Bachelor's"
+    ],
+    "url": "https://astrazeneca.wd3.myworkdayjobs.com/Careers/job/US---Gaithersburg---MD/Quantitative-Systems-Pharmacology-Modeling-Intern--PhD-Students_R-241829",
+    "company_name": "AstraZeneca",
+    "title": "Quantitative Systems Pharmacology Modeling Intern, PhD Students",
+    "locations": [
+      "Gaithersburg, MD"
+    ],
+    "terms": [
+      "Summer 2026"
+    ],
+    "category": "Software Engineering",
+    "source": "AlmondCroffle",
+    "id": "e6a72cfd-b318-4a00-95fb-0dad2ddc9233",
+    "date_posted": 1765906008,
+    "company_url": "",
+    "is_visible": false
+  }
+]

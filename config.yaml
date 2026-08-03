@@ -1,0 +1,32 @@
+sheet_id: 19RlnaPIeMfAb73fUrZhc0mWxSGwWvdUR5u6kSlk9A2c
+digest_email: hiepnguyentcu@gmail.com
+timezone: America/Los_Angeles
+repos:
+- name: SimplifyJobs
+  type: json
+  url: https://raw.githubusercontent.com/SimplifyJobs/Summer2027-Internships/dev/.github/scripts/listings.json
+  category_filter:
+  - Software
+- name: vanshb03
+  type: json
+  url: https://raw.githubusercontent.com/vanshb03/Summer2027-Internships/dev/.github/scripts/listings.json
+  category_filter: []   # this repo's listings.json has no "category" field at all
+- name: speedyapply
+  type: markdown
+  url: https://raw.githubusercontent.com/speedyapply/2027-SWE-College-Jobs/main/README.md
+- name: jobright-ai
+  type: markdown
+  url: https://raw.githubusercontent.com/jobright-ai/2026-Software-Engineer-Internship/master/README.md
+cold_email:
+  throttle_per_run: 3
+action_items:
+  stale_application_days: 14
+  stale_cold_email_days: 6
+  oa_reminder_minutes_before: [1440, 120]   # 24h and 2h before the OA due date (9am local)
+  # Calibrated against a real job posting, not guessed: scores are inherently
+  # low in absolute terms (top-50-JD-keyword overlap includes company/role
+  # proper nouns like the company name itself, which a resume can't "match").
+  # Measured: clearly-wrong-domain resume scored 0.02, a generically relevant
+  # but untailored resume scored 0.14, a deliberately JD-tailored one scored
+  # 0.24. 0.08 sits below the "plausible match" floor with some margin.
+  jd_overlap_warning_threshold: 0.08
